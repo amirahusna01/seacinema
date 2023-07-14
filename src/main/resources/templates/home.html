@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Beranda</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+        <style>
+        .ticket-card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-block-end: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            inline-size: 100%;
+            border-radius: 10px;
+        }
+        .ticket-poster {
+            inline-size: 150px;
+            margin-block-end: 10px;
+            margin-inline-end: 30px;
+        }
+        .ticket-details {
+            flex-grow: 1;
+            inline-size: 50%;
+        }
+        .ticket-total-cost {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: end;
+            inline-size: 20%;
+        }
+        .container {
+            border-radius: 10px;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            block-size: 100%;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+        </style>
+    </head>
+        </style>
+    </head>
+
+    <body class="bg-secondary">
+        <nav th:replace="fragments/fragment :: navbar('home')"></nav>
+<div class="container bg-light">
+    <div class="m-4">
+        <br>
+        <h1 class="text-primary" style="text-align: center;">Welcome to SEA Cinema!</h1>
+    </div>
+    <div class="d-flex justify-content-center">
+            <div class="ticket-card bg-white">
+                <div class="ticket-details">
+                    <h4>Balance: $<span th:text="${user.balance}"></span></h4>
+                </div>
+                <div class="ticket-total-cost">
+                    <a th:href="@{/profile}" class="btn btn-primary">My Profile</a>
+                </div>
+            </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="ticket-card bg-white">
+            <div class="ticket-details">
+                <h4>My Ticket</h4>
+                <p th:if="${#lists.isEmpty(ticketList)}">Ooops, you don't have any tickets yet</p>
+                <p th:unless="${#lists.isEmpty(ticketList)}">Movie: <span th:text="${ticketList[0].movie.title}"></span></p>
+                <p th:unless="${#lists.isEmpty(ticketList)}">Seat: <span th:text="${ticketList[0].seat}"></span></p>
+            </div>
+            <div class="ticket-total-cost">
+                <a th:href="@{/tickets}" class="btn btn-primary">See All</a>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="ticket-card bg-white">
+            <div class="ticket-details">
+                <h4>Now Featured</h4>
+                <br>
+                <div class="row">
+                    <div th:each="movie, iter : ${movies.subList(0, 4)}" class="col-md-3">
+                        <div class="card">
+                            <img th:src="${movie.posterUrl}" class="card-img-top" alt="Movie Poster">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${movie.title}"></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ticket-total-cost">
+                <a th:href="@{/movies}" class="btn btn-primary">See All</a>
+            </div>
+        </div>
+    </div>
+</div>
+        
+    
+    </body>
+</html>

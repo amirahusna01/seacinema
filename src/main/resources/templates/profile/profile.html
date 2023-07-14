@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>My Profile</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <style>
+        .container {
+            border-radius: 10px;
+            /* display: flex; */
+            justify-content: center;
+            /* align-items: center; */
+            block-size: 100%;
+            inline-size: 40%;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+        </style>
+    </head>
+    <body class="bg-secondary">
+        <nav th:replace="fragments/fragment :: navbar('profile')"></nav>
+        <div class="container bg-light">
+            <div class="row">
+                <div class="col-md-10 offset-md-1">
+                    <br>
+                    <h2 class="text-primary text-center">Profile Detail</h2>
+                    <br>
+                    <p>Name: <span th:text="${profile.name}"></span></p>
+                    <p>Username: <span th:text="${profile.username}"></span></p>
+                    <p>Balance: $<span id="balance" th:text="${profile.balance}"></span></p>
+                    <form th:action="@{/profile/topup/{id}(${profile.id})}" method="POST">
+                        <input type="hidden" id="userId" th:value="${profile.id}" />
+                        <div class="form-group">
+                            <label for="topupAmount">Top-up Amount:</label>
+                            <input type="number" class="form-control" id="topupAmount" name="amount" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#topupModal">
+                            Top-up
+                        </button>
+                    </form>
+                    <br>
+                    <form th:action="@{/profile/withdrawal/{id}(${profile.id})}" method="POST" th:if="${profile.balance > 500000 or profile.balance < 500000}">
+                        <input type="hidden" id="userId" th:value="${profile.id}" />
+                        <div class="form-group">
+                            <label for="withdrawalAmount">Withdrawal Amount (Max. $500.000):</label>
+                            <input type="number" class="form-control" id="withdrawalAmount" name="amount" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#withdrawalModal"
+                                id="withdrawalButton">
+                            Withdrawal
+                        </button>
+                    </form>
+                    <br>
+                </div>
+            </div>
+        </div>
+        
+<!-- Top-up Confirmation Modal -->
+<div class="modal fade" id="topupModal" tabindex="-1" role="dialog" aria-labelledby="topupModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="topupModalLabel">Top-up Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to top-up this amount?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmTopupButton">Top-up</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Withdrawal Confirmation Modal -->
+<div class="modal fade" id="withdrawalModal" tabindex="-1" role="dialog" aria-labelledby="withdrawalModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="withdrawalModalLabel">Withdrawal Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to withdraw this amount?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmWithdrawalButton">Withdrawal</button>
+            </div>
+        </div>
+    </div>
+</div>
+        
+        <script>
+            function checkWithdrawalAmount(input) {
+                var withdrawalAmount = input.value;
+                var balanceElement = document.getElementById("balance");
+                var withdrawalButton = document.getElementById("withdrawalButton");
+        
+                if (withdrawalAmount > balanceElement.textContent || withdrawalAmount > 500000) {
+                    withdrawalButton.disabled = true;
+                } else {
+                    withdrawalButton.disabled = false;
+                }
+            }
+            var userIdElement = document.getElementById('userId');
+            $(document).ready(function () {
+                // Handle click event on "Confirm Top-up" button in top-up modal
+                $('#confirmTopupButton').click(function () {
+                    // Perform AJAX request to submit the form
+                    var amount = $('#topupAmount').val();
+
+                    // Validate the input
+                    if (amount === '') {
+                        alert('Please enter a top-up amount.');
+                        return;
+                    }
+                    var formData = new FormData();
+                    formData.append('amount', $('#topupAmount').val());
+                    var csrfToken = $('meta[name="_csrf"]').attr('content');
+                    var csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+                    $.ajax({
+                        url: '/profile/topup',
+                        method: 'POST',
+                        processData: false,
+                        contentType: false,
+                        data: formData,            
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
+                        success: function (response) {
+                            alert('Top-up successful!');
+                            $('#topupModal').modal('hide');
+                            window.location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            alert('An error occurred while processing the top-up.');
+                            $('#topupModal').modal('hide');
+                        }
+                    });
+                });
+        
+                // Handle click event on "Confirm Withdrawal" button in withdrawal modal
+                $('#confirmWithdrawalButton').click(function () {
+                    // Perform AJAX request to submit the form
+
+                    var amount = $('#withdrawalAmount').val();
+                    var balance = parseFloat($('#balance').text());
+
+                    // Validate the input
+                    if (amount === '') {
+                        alert('Please enter a withdrawal amount.');
+                        return;
+                    }
+                    if (parseFloat(amount) > balance || parseFloat(amount) > 500000) {
+                        alert('Invalid withdrawal amount.');
+                        return;
+                    }
+                    var formData = new FormData();
+                    formData.append('amount', $('#withdrawalAmount').val());
+                    var csrfToken = $('meta[name="_csrf"]').attr('content');
+                    var csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+                    console.log("kesini2");
+                    $.ajax({
+                        url: '/profile/withdrawal',
+                        method: 'POST',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
+                        success: function (response) {
+                            $('#withdrawalModal').modal('hide');
+                            alert('Withdrawal successful!');
+                            window.location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            $('#withdrawalModal').modal('hide');
+                            alert('An error occurred while processing the withdrawal.');
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Movies</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+        <style>
+        .container {
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            block-size: 100vh;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+        .seat-checkbox {
+            display: none;
+        }
+
+        .seat-label {
+            background-color: #28a745;
+        }
+        .available {
+            background-color: #28a745;
+        }
+
+        .seat-checkbox:checked + .seat-label {
+            background-color: red;
+        }
+
+        .seat-checkbox:disabled + .seat-label {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .seat-checkbox:disabled ~ .seat-label.booked {
+            background-color: #868e96;
+        }
+
+        .booked {
+            background-color: #868e96; /* Warna abu-abu */
+        }
+        </style>
+    </head>
+    
+    <body>
+        <nav th:replace="fragments/fragment :: navbar('movies')"></nav>
+        <div class="container">
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                <span th:text="${errorMessage}"></span>
+            </div>
+            <h2>Movie Ticket Booking</h2>
+            <h3><span th:text="${movie.title}"></span></h3>
+            <h4>Seat Selection:</h4>
+            <form th:action="@{/movies/{movieId}/booking(movieId=${movie.id})}" method="post">
+                <input type="hidden" id="ticketPrice" th:value="${movie.ticketPrice}" />
+                <input type="hidden" id="userBalance" th:value="${user.balance}" />
+                <div class="row">
+                    <div class="col-md-6 offset-md-3 text-center">
+                        <h4>Screen</h4>
+                        <table class="table table-bordered text-center">
+                            <tbody>
+                                <tr th:each="row : ${#numbers.sequence(1, 8)}">
+                                    <td th:each="col : ${#numbers.sequence(1, 8)}">
+                                        <label class="seat-label"
+                                        th:class="${bookedSeats.contains(row * 10 + col)} ? 'booked' : 'available'">
+                                            <input type="checkbox" class="seat-checkbox" name="seatNumbers"
+                                                   th:value="${row * 10 + col}"
+                                                   th:disabled="${bookedSeats.contains(row * 10 + col)}"
+                                                   onclick="changeCheckboxColor(this); checkSeatLimit(); " />
+                                            <span th:text="${row + '' + col}"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <p>Max. 6 Seats</p>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Book Tickets</button>
+                <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-danger">Cancel</a>
+            </form>
+            <br>
+            
+        </div>
+
+        <script>
+
+        function changeCheckboxColor(checkbox) {
+            var label = checkbox.parentElement;
+            if (checkbox.checked) {
+                label.style.backgroundColor = 'red';
+            } else {
+                label.style.backgroundColor = checkbox.disabled ? '#6c757d' : '#28a745';
+            }
+        }
+
+        function checkSeatLimit() {
+            var checkboxes = document.getElementsByClassName('seat-checkbox');
+            var selectedCount = document.querySelectorAll('.seat-checkbox:checked').length;
+            var seatLimit = 6;
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                var checkbox = checkboxes[i];
+
+                if (!checkbox.checked && selectedCount >= seatLimit) {
+                    checkbox.disabled = true;
+                    checkbox.parentElement.classList.remove('enabled');
+                } else {
+                    checkbox.disabled = false;
+                    checkbox.parentElement.classList.add('enabled');
+                }
+            }     
+        }
+        $(document).ready(function() {
+            $('form').submit(function(event) {
+                var selectedSeats = $('input[name="seatNumbers"]:checked');
+                
+                if (selectedSeats.length === 0) {
+                event.preventDefault(); // Menghentikan submit form
+                
+                // Tampilkan alert jika tidak ada bangku yang dipilih
+                alert('Please select at least one seat.');
+                }
+            });
+        });
+        </script>
+    </body>
+</html>

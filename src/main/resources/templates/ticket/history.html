@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Movies</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+        <style>
+        .ticket-card {
+            border-radius: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-block-end: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            inline-size: 100%;
+        }
+        .ticket-poster {
+            inline-size: 150px;
+            margin-block-end: 10px;
+            margin-inline-end: 30px;
+        }
+        .ticket-details {
+            flex-grow: 1;
+            inline-size: 50%;
+        }
+        .ticket-total-cost {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: end;
+            inline-size: 20%;
+        }
+        .container {
+            border-radius: 10px;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            block-size: 100%;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+        </style>
+    </head>
+    
+    <body class="bg-secondary">
+        <nav th:replace="fragments/fragment :: navbar('tickets')"></nav>
+        <div class="container bg-light">
+            <br>
+            <h2>My Ticket History</h2>
+            <br>
+            <div class="row justify-content-center">
+                <div th:each="ticket : ${ticketList}" class="col-md-10">
+                    <div class="ticket-card bg-white">
+                        <img th:src="${ticket.movie.posterUrl}" class="ticket-poster" alt="Movie Poster">
+                        <div class="ticket-details">
+                            <h4>ID Ticket: <span th:text="${ticket.id}"></span></h4>
+                            <p>Movie Title: <span th:text="${ticket.movie.title}"></span></p>
+                            <p>Movie Price: $<span th:text="${ticket.movie.ticketPrice}"></span> x <span th:text="${#lists.size(ticket.seat)}"></span></p>
+                            <p>Seat Numbers: <span th:text="${ticket.seat}"></span></p>
+                        </div>
+                        <div class="ticket-total-cost">
+                            <h5>$<span th:text="${ticket.total}"></span></h5>
+                            <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-primary">Detail</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center" th:if="${#lists.isEmpty(ticketList)}">
+                <div class="col-md-6 text-center">
+                    <h4>Ooops, you don't have any tickets yet</h4>
+                    <a th:href="@{/movies}" class="btn btn-primary">Browse Movies</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Movies</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+        <style>
+            .container {
+                /* display: flex; */
+                justify-content: center;
+                align-items: center;
+                block-size: 100vh;
+                margin-block-start: 50px;
+                margin-block-end: 50px;
+            }
+
+        .poster {
+            max-inline-size: 200px;
+            block-size: auto;
+            margin: 0 auto;
+            display: block;
+            margin-block-end: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .description {
+            text-align: justify;
+        }
+            </style>
+    </head>
+    <body>
+        <nav th:replace="fragments/fragment :: navbar('movies')"></nav>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <img class="poster" th:src="@{${movie.posterUrl}}" alt="Movie Poster">
+                    <h4 class="text-center" th:text="${movie.title}"></h4>
+                    <p class="text-center">Age Rating: <span th:text="${movie.ageRating}"></span></p>
+                    <p class="text-center">Release Date: <span th:text="${movie.releaseDate}"></span></p>
+                    <p class="text-center">Price: $<span th:text="${movie.ticketPrice}"></span></p>
+                    <p class="description" th:text="${movie.description}"></p>
+                    <a th:href="@{/movies/{id}/booking(id=${movie.id})}" class="btn btn-primary">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

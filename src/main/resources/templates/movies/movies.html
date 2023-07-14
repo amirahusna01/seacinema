@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Movies</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+            <style>
+        .container {
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            block-size: 100vh;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+
+        .card {
+            margin: 10px;
+            block-size: 550px;
+        }
+
+        .card-img-top {
+            inline-size: 100%;
+            block-size: 350px;
+            /* object-fit: cover; */
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            block-size: 100%;
+        }
+
+        .card-content {
+            flex-grow: 1;
+        }
+
+        .see-more-btn {
+            position: absolute;
+            inset-block-end: 5px;
+            inset-inline-start: 10px;
+        }
+
+        .container {
+            border-radius: 10px;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            block-size: 100%;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+    </style>
+    </head>
+    
+    <body class="bg-secondary">
+        <nav th:replace="fragments/fragment :: navbar('movies')"></nav>
+        <div class="container bg-light"><br>
+            <h2 class="text-primary" style="text-align: center;">Now Showing</h2>
+            <br>
+
+            <div class="row justify-content-center">
+                <div class="col-md-4" th:each="movie : ${movies}">
+                    <div class="card">
+                        
+                        <div class="card-body">
+                            <img class="card-img-top" th:src="@{${movie.posterUrl}}" alt="Movie Poster">
+                            <div class="card-content" style="block-size: 100%;">
+                                <h5 class="card-title" th:text="${movie.title}"></h5>
+                                <p class="card-text">Age Rating: <span th:text="${movie.ageRating}"></span></p>
+                                <p class="card-text">Price: $<span th:text="${movie.ticketPrice}"></span></p>
+                                <a th:href="@{/movie/{id}(id=${movie.id})}" class="btn btn-primary">See More</a>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

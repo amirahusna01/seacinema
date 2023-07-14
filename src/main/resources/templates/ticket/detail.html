@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Ticket Detail</title>
+        <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+        <script></script>
+        <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
+        <script th:src="@{/js/bootstrap.min.js}"  ></script>
+        <object th:include="fragments/fragment :: css" th:remove="tag"></object>
+        <object th:include="fragments/fragment :: js" th:remove="tag"></object>
+        <style>
+        .ticket-card {
+            border-radius: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-block-end: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            inline-size: 90%;
+        }
+        .ticket-poster {
+            inline-size: 150px;
+            margin-block-end: 10px;
+            margin-inline-end: 30px;
+        }
+        .ticket-details {
+            flex-grow: 1;
+            inline-size: 50%;
+        }
+        .ticket-total-cost {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: end;
+            inline-size: 20%;
+        }
+        .container {
+            border-radius: 10px;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            block-size: 100%;
+            margin-block-start: 50px;
+            margin-block-end: 50px;
+        }
+        </style>
+    </head>
+    
+    <body class="bg-secondary">
+        <nav th:replace="fragments/fragment :: navbar('tickets')"></nav>
+        <div class="container bg-light">
+            <br>
+            <h2 class="text-primary text-center">My Ticket History</h2>
+            <br>
+            <div class="row justify-content-center">
+                <div class="ticket-card">
+                    <img th:src="${ticket.movie.posterUrl}" class="ticket-poster" alt="Movie Poster">
+                    <div class="ticket-details">
+                        <h4><span th:text="${ticket.movie.title}"></span></h4>
+                        <p>Movie Price: $<span th:text="${ticket.movie.ticketPrice}"></span></p>
+                        <p>Age Rating: $<span th:text="${ticket.movie.ageRating}"></span></p>
+                        <p>Release Date: $<span th:text="${ticket.movie.releaseDate}"></span></p>
+                    </div>
+
+                </div>
+                <div class="ticket-card">
+                    <div class="ticket-details">
+                        <h4>ID Ticket: <span th:text="${ticket.id}"></span></h4>
+                        <p>Movie Title: <span th:text="${ticket.movie.title}"></span></p>
+                        <p>Seat Numbers: <span th:text="${ticket.seat}"></span></p>
+                        <p>Ticket Price: $<span th:text="${ticket.movie.ticketPrice}"></span> x <span th:text="${#lists.size(ticket.seat)}"></span></p>
+                        <h5>Total: $<span th:text="${ticket.total}"></span></h5>
+                    </div>
+                    <div class="ticket-total-cost">
+                        <button class="btn btn-danger" data-toggle="modal" data-ticket-id="${ticket.id}" data-target="#cancelModal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Cancel Confirmation Modal -->
+        <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModalLabel">Ticket Cancellation Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to cancel this ticket?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form th:action="@{/tickets/{id}/cancel(id=${ticket.id})}" method="post">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Confirm</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
